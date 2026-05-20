@@ -1,0 +1,255 @@
+{
+  "_invocations": {
+    "sebs-6dbc6478-110-dynamic-html-python-3-11": {
+      "14d62c31-17be-4d31-bb87-9a341692a99f": {
+        "billing": {
+          "_billed_time": null,
+          "_gb_seconds": 0,
+          "_memory": null
+        },
+        "output": {
+          "begin": "1779299488.685338",
+          "end": "1779299488.688099",
+          "is_cold": false,
+          "request_id": "14d62c31-17be-4d31-bb87-9a341692a99f",
+          "result": {
+            "result": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Randomly generated data.</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link href=\"http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">\n    <style type=\"text/css\">\n      .container {\n        max-width: 500px;\n        padding-top: 100px;\n      }\n    </style>\n  </head>\n  <body>\n    <div class=\"container\">\n      <p>Welcome testname!</p>\n      <p>Data generated at: 2026-05-20 17:51:28.685458!</p>\n      <p>Requested random numbers:</p>\n      <ul>\n        \n        <li>356168</li>\n        \n        <li>851498</li>\n        \n        <li>595312</li>\n        \n        <li>981655</li>\n        \n        <li>480860</li>\n        \n        <li>131647</li>\n        \n        <li>950545</li>\n        \n        <li>205851</li>\n        \n        <li>356358</li>\n        \n        <li>551277</li>\n        \n      </ul>\n    </div>\n  </body>\n</html>"
+          }
+        },
+        "provider_times": {
+          "execution": 0,
+          "initialization": 0
+        },
+        "request_id": "14d62c31-17be-4d31-bb87-9a341692a99f",
+        "stats": {
+          "cold_start": false,
+          "failure": false,
+          "memory_used": null
+        },
+        "times": {
+          "benchmark": 2761,
+          "client": 21671,
+          "client_begin": "2026-05-20 14:51:28.670263",
+          "client_end": "2026-05-20 14:51:28.691934",
+          "http_first_byte_return": 0.021541,
+          "http_startup": 0.000197,
+          "initialization": 0
+        }
+      },
+      "27f5e4f4-7e5b-471e-ae7a-686959d4d2af": {
+        "billing": {
+          "_billed_time": null,
+          "_gb_seconds": 0,
+          "_memory": null
+        },
+        "output": {
+          "begin": "1779299488.711096",
+          "end": "1779299488.713063",
+          "is_cold": false,
+          "request_id": "27f5e4f4-7e5b-471e-ae7a-686959d4d2af",
+          "result": {
+            "result": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Randomly generated data.</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link href=\"http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">\n    <style type=\"text/css\">\n      .container {\n        max-width: 500px;\n        padding-top: 100px;\n      }\n    </style>\n  </head>\n  <body>\n    <div class=\"container\">\n      <p>Welcome testname!</p>\n      <p>Data generated at: 2026-05-20 17:51:28.711176!</p>\n      <p>Requested random numbers:</p>\n      <ul>\n        \n        <li>131712</li>\n        \n        <li>271042</li>\n        \n        <li>862402</li>\n        \n        <li>177117</li>\n        \n        <li>100690</li>\n        \n        <li>451335</li>\n        \n        <li>338657</li>\n        \n        <li>446571</li>\n        \n        <li>35682</li>\n        \n        <li>393309</li>\n        \n      </ul>\n    </div>\n  </body>\n</html>"
+          }
+        },
+        "provider_times": {
+          "execution": 0,
+          "initialization": 0
+        },
+        "request_id": "27f5e4f4-7e5b-471e-ae7a-686959d4d2af",
+        "stats": {
+          "cold_start": false,
+          "failure": false,
+          "memory_used": null
+        },
+        "times": {
+          "benchmark": 1967,
+          "client": 20879,
+          "client_begin": "2026-05-20 14:51:28.694383",
+          "client_end": "2026-05-20 14:51:28.715262",
+          "http_first_byte_return": 0.020549,
+          "http_startup": 0.000376,
+          "initialization": 0
+        }
+      },
+      "33ff2d83-1d61-4e55-a629-cab39045f324": {
+        "billing": {
+          "_billed_time": null,
+          "_gb_seconds": 0,
+          "_memory": null
+        },
+        "output": {
+          "begin": "1779299488.734566",
+          "end": "1779299488.736904",
+          "is_cold": false,
+          "request_id": "33ff2d83-1d61-4e55-a629-cab39045f324",
+          "result": {
+            "result": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Randomly generated data.</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link href=\"http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">\n    <style type=\"text/css\">\n      .container {\n        max-width: 500px;\n        padding-top: 100px;\n      }\n    </style>\n  </head>\n  <body>\n    <div class=\"container\">\n      <p>Welcome testname!</p>\n      <p>Data generated at: 2026-05-20 17:51:28.734684!</p>\n      <p>Requested random numbers:</p>\n      <ul>\n        \n        <li>221969</li>\n        \n        <li>71742</li>\n        \n        <li>548979</li>\n        \n        <li>716976</li>\n        \n        <li>179278</li>\n        \n        <li>801970</li>\n        \n        <li>335326</li>\n        \n        <li>841421</li>\n        \n        <li>221439</li>\n        \n        <li>991972</li>\n        \n      </ul>\n    </div>\n  </body>\n</html>"
+          }
+        },
+        "provider_times": {
+          "execution": 0,
+          "initialization": 0
+        },
+        "request_id": "33ff2d83-1d61-4e55-a629-cab39045f324",
+        "stats": {
+          "cold_start": false,
+          "failure": false,
+          "memory_used": null
+        },
+        "times": {
+          "benchmark": 2338,
+          "client": 24004,
+          "client_begin": "2026-05-20 14:51:28.716149",
+          "client_end": "2026-05-20 14:51:28.740153",
+          "http_first_byte_return": 0.023898,
+          "http_startup": 0.000333,
+          "initialization": 0
+        }
+      },
+      "960c3df4-9b61-4879-9b26-65af2f489639": {
+        "billing": {
+          "_billed_time": null,
+          "_gb_seconds": 0,
+          "_memory": null
+        },
+        "output": {
+          "begin": "1779299488.664349",
+          "end": "1779299488.666839",
+          "is_cold": false,
+          "request_id": "960c3df4-9b61-4879-9b26-65af2f489639",
+          "result": {
+            "result": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Randomly generated data.</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link href=\"http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">\n    <style type=\"text/css\">\n      .container {\n        max-width: 500px;\n        padding-top: 100px;\n      }\n    </style>\n  </head>\n  <body>\n    <div class=\"container\">\n      <p>Welcome testname!</p>\n      <p>Data generated at: 2026-05-20 17:51:28.664459!</p>\n      <p>Requested random numbers:</p>\n      <ul>\n        \n        <li>393054</li>\n        \n        <li>653870</li>\n        \n        <li>732856</li>\n        \n        <li>578983</li>\n        \n        <li>662219</li>\n        \n        <li>99281</li>\n        \n        <li>488569</li>\n        \n        <li>959746</li>\n        \n        <li>478087</li>\n        \n        <li>507350</li>\n        \n      </ul>\n    </div>\n  </body>\n</html>"
+          }
+        },
+        "provider_times": {
+          "execution": 0,
+          "initialization": 0
+        },
+        "request_id": "960c3df4-9b61-4879-9b26-65af2f489639",
+        "stats": {
+          "cold_start": false,
+          "failure": false,
+          "memory_used": null
+        },
+        "times": {
+          "benchmark": 2490,
+          "client": 18069,
+          "client_begin": "2026-05-20 14:51:28.651344",
+          "client_end": "2026-05-20 14:51:28.669413",
+          "http_first_byte_return": 0.017641,
+          "http_startup": 0.000152,
+          "initialization": 0
+        }
+      },
+      "c21abfb7-b447-44dd-8d92-175eb0e0c67d": {
+        "billing": {
+          "_billed_time": null,
+          "_gb_seconds": 0,
+          "_memory": null
+        },
+        "output": {
+          "begin": "1779299488.645349",
+          "end": "1779299488.648092",
+          "is_cold": false,
+          "request_id": "c21abfb7-b447-44dd-8d92-175eb0e0c67d",
+          "result": {
+            "result": "<!DOCTYPE html>\n<html>\n  <head>\n    <title>Randomly generated data.</title>\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n    <link href=\"http://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css\" rel=\"stylesheet\" media=\"screen\">\n    <style type=\"text/css\">\n      .container {\n        max-width: 500px;\n        padding-top: 100px;\n      }\n    </style>\n  </head>\n  <body>\n    <div class=\"container\">\n      <p>Welcome testname!</p>\n      <p>Data generated at: 2026-05-20 17:51:28.645658!</p>\n      <p>Requested random numbers:</p>\n      <ul>\n        \n        <li>635618</li>\n        \n        <li>35002</li>\n        \n        <li>641939</li>\n        \n        <li>9290</li>\n        \n        <li>747611</li>\n        \n        <li>380792</li>\n        \n        <li>653947</li>\n        \n        <li>888147</li>\n        \n        <li>798297</li>\n        \n        <li>889343</li>\n        \n      </ul>\n    </div>\n  </body>\n</html>"
+          }
+        },
+        "provider_times": {
+          "execution": 0,
+          "initialization": 0
+        },
+        "request_id": "c21abfb7-b447-44dd-8d92-175eb0e0c67d",
+        "stats": {
+          "cold_start": false,
+          "failure": false,
+          "memory_used": null
+        },
+        "times": {
+          "benchmark": 2743,
+          "client": 21618,
+          "client_begin": "2026-05-20 14:51:28.628236",
+          "client_end": "2026-05-20 14:51:28.649854",
+          "http_first_byte_return": 0.021473,
+          "http_startup": 0.000172,
+          "initialization": 0
+        }
+      }
+    }
+  },
+  "_metrics": {},
+  "begin_time": 1779299488.615269,
+  "config": {
+    "deployment": {
+      "credentials": {},
+      "dockerhubRepository": "uygc/serverless-benchmarks",
+      "experimentalManifest": false,
+      "faasCli": "faas-cli",
+      "gateway": "http://127.0.0.1:8080",
+      "name": "openfaas",
+      "namespace": "openfaas-fn",
+      "resources": {
+        "docker_password": null,
+        "docker_registry": null,
+        "docker_username": null
+      },
+      "shutdownStorage": false
+    },
+    "experiments": {
+      "architecture": "x64",
+      "download_results": false,
+      "experiments": {
+        "eviction-model": {
+          "function_copy_idx": 0,
+          "invocations": 1,
+          "repetitions": 5,
+          "sleep": 1
+        },
+        "invocation-overhead": {
+          "N": 20,
+          "code_begin": 1048576,
+          "code_end": 261619712,
+          "code_points": 20,
+          "payload_begin": 1024,
+          "payload_end": 6251000,
+          "payload_points": 20,
+          "repetitions": 5,
+          "type": "payload"
+        },
+        "network-ping-pong": {
+          "invocations": 50,
+          "repetitions": 1000,
+          "threads": 1
+        },
+        "perf-cost": {
+          "benchmark": "110.dynamic-html",
+          "concurrent-invocations": 50,
+          "experiments": [
+            "cold",
+            "warm",
+            "burst",
+            "sequential"
+          ],
+          "input-size": "test",
+          "memory-sizes": [
+            128,
+            256
+          ],
+          "repetitions": 50
+        }
+      },
+      "flags": {},
+      "runtime": {
+        "language": "python",
+        "language-variant": "default",
+        "version": "3.11"
+      },
+      "system_variant": "container",
+      "update_code": true,
+      "update_storage": false
+    }
+  },
+  "end_time": 1779299488.740533,
+  "result_bucket": null
+}
