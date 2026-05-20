@@ -12,6 +12,27 @@ sys.path.append(os.path.join(CODE_LOCATION, ".python_packages/lib/site-packages/
 
 
 class Handler(BaseHTTPRequestHandler):
+    def _read_body(self):
+        length = self.headers.get("Content-Length")
+        if length is not None:
+            return self.rfile.read(int(length))
+
+        if self.headers.get("Transfer-Encoding", "").lower() == "chunked":
+            chunks = []
+            while True:
+                size_line = self.rfile.readline().strip()
+                if not size_line:
+                    continue
+                size = int(size_line.split(b";", 1)[0], 16)
+                if size == 0:
+                    self.rfile.readline()
+                    break
+                chunks.append(self.rfile.read(size))
+                self.rfile.readline()
+            return b"".join(chunks)
+
+        return b"{}"
+
     def _write_json(self, status, payload):
         encoded = json.dumps(payload).encode("utf-8")
         self.send_response(status)
@@ -30,8 +51,7 @@ class Handler(BaseHTTPRequestHandler):
         begin = datetime.datetime.now()
         request_id = str(uuid.uuid4())
         try:
-            length = int(self.headers.get("Content-Length", "0"))
-            payload = json.loads(self.rfile.read(length) or b"{}")
+            payload = json.loads(self._read_body() or b"{}")
 
             from function import handler
 
