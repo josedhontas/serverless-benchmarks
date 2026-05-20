@@ -21,7 +21,7 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(encoded)
 
     def do_GET(self):
-        if self.path == "/alive":
+        if self.path in ("/alive", "/_/health"):
             self._write_json(200, {"result": "ok"})
         else:
             self._write_json(404, {"error": "not found"})

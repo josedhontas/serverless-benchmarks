@@ -35,7 +35,7 @@ function writeJson(res, status, payload) {
 
 http
   .createServer((req, res) => {
-    if (req.method === "GET" && req.url === "/alive") {
+    if (req.method === "GET" && (req.url === "/alive" || req.url === "/_/health")) {
       writeJson(res, 200, { result: "ok" });
       return;
     }
