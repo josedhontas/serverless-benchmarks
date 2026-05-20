@@ -53,7 +53,9 @@ class Credentials(ABC, LoggingBase):
 
     @staticmethod
     @abstractmethod
-    def deserialize(config: dict, cache: Cache, handlers: LoggingHandlers) -> "Credentials":
+    def deserialize(
+        config: dict, cache: Cache, handlers: LoggingHandlers
+    ) -> "Credentials":
         """Create credentials instance from user config and cached values.
 
         This method implements the credential loading hierarchy:
@@ -201,7 +203,9 @@ class Resources(ABC, LoggingBase):
         """
         self._region = region
 
-    def get_storage_bucket(self, bucket_type: Resources.StorageBucketType) -> Optional[str]:
+    def get_storage_bucket(
+        self, bucket_type: Resources.StorageBucketType
+    ) -> Optional[str]:
         """Get the bucket name for a specific bucket type.
 
         Args:
@@ -225,7 +229,9 @@ class Resources(ABC, LoggingBase):
         """
         return f"sebs-{bucket_type.value}-{self._resources_id}"
 
-    def set_storage_bucket(self, bucket_type: Resources.StorageBucketType, bucket_name: str):
+    def set_storage_bucket(
+        self, bucket_type: Resources.StorageBucketType, bucket_name: str
+    ):
         """Set the bucket name for a specific bucket type.
 
         Args:
@@ -264,7 +270,9 @@ class Resources(ABC, LoggingBase):
 
     @staticmethod
     @abstractmethod
-    def deserialize(config: dict, cache: Cache, handlers: LoggingHandlers) -> "Resources":
+    def deserialize(
+        config: dict, cache: Cache, handlers: LoggingHandlers
+    ) -> "Resources":
         """Create resources instance from user config and cached values.
 
         Args:
@@ -431,6 +439,10 @@ class Config(ABC, LoggingBase):
             from sebs.openwhisk.config import OpenWhiskConfig
 
             implementations["openwhisk"] = OpenWhiskConfig.deserialize
+        if has_platform("openfaas"):
+            from sebs.openfaas.config import OpenFaaSConfig
+
+            implementations["openfaas"] = OpenFaaSConfig.deserialize
         func = implementations.get(name)
         assert func, "Unknown config type!"
         return func(config[name] if name in config else config, cache, handlers)

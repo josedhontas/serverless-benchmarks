@@ -11,7 +11,7 @@ Classes:
 
 import json
 import os
-from signal import SIGKILL
+import signal
 from statistics import mean
 from typing import List, Optional
 
@@ -133,10 +133,14 @@ class Deployment(LoggingBase):
             for func in input_data["functions"]:
                 deployment._functions.append(LocalFunction.deserialize(func))
             if "memory_measurements" in input_data:
-                deployment._memory_measurement_pids = input_data["memory_measurements"]["pids"]
+                deployment._memory_measurement_pids = input_data["memory_measurements"][
+                    "pids"
+                ]
                 deployment._measurement_file = input_data["memory_measurements"]["file"]
             deployment._storage = Minio.deserialize(
-                MinioConfig.deserialize(input_data["storage"]), cache_client, LocalResources()
+                MinioConfig.deserialize(input_data["storage"]),
+                cache_client,
+                LocalResources(),
             )
             return deployment
 
@@ -156,7 +160,7 @@ class Deployment(LoggingBase):
 
             # kill measuring processes
             for proc in self._memory_measurement_pids:
-                os.kill(proc, SIGKILL)
+                os.kill(proc, getattr(signal, "SIGKILL", signal.SIGTERM))
 
         if self._measurement_file is not None:
 

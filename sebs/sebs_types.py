@@ -41,6 +41,7 @@ class Platforms(str, Enum):
     GCP = "gcp"
     LOCAL = "local"
     OPENWHISK = "openwhisk"
+    OPENFAAS = "openfaas"
 
 
 class Storage(str, Enum):

@@ -28,7 +28,12 @@ from sebs.faas.config import Resources
 from sebs.faas.container import DockerContainer
 from sebs.faas.resources import SystemResources
 from sebs.faas.storage import PersistentStorage
-from sebs.utils import find_benchmark, get_resource_path, ensure_benchmarks_data, LoggingBase
+from sebs.utils import (
+    find_benchmark,
+    get_resource_path,
+    ensure_benchmarks_data,
+    LoggingBase,
+)
 from sebs.sebs_types import BenchmarkModule, Language
 from typing import TYPE_CHECKING
 
@@ -242,7 +247,8 @@ class BenchmarkConfig:
             [LanguageSpec.deserialize(x) for x in json_object["languages"]],
             [BenchmarkModule(x) for x in json_object["modules"]],
             cpp_dependencies=[
-                CppDependencies.deserialize(x) for x in json_object.get("cpp_dependencies", [])
+                CppDependencies.deserialize(x)
+                for x in json_object.get("cpp_dependencies", [])
             ],
         )
 
@@ -372,7 +378,9 @@ class Benchmark(LoggingBase):
                 """
                 Access cached code package instead of a built one.
                 """
-                return os.path.join(self._cache_client.cache_dir, self.code_package["location"])
+                return os.path.join(
+                    self._cache_client.cache_dir, self.code_package["location"]
+                )
             return None
         else:
             return self._code_location
@@ -608,7 +616,9 @@ class Benchmark(LoggingBase):
 
         benchmark_path = find_benchmark(self.benchmark, "benchmarks")
         if not benchmark_path:
-            raise RuntimeError("Benchmark {benchmark} not found!".format(benchmark=self._benchmark))
+            raise RuntimeError(
+                "Benchmark {benchmark} not found!".format(benchmark=self._benchmark)
+            )
         self._benchmark_path = benchmark_path
 
         with open(os.path.join(self.benchmark_path, "config.json")) as json_file:
@@ -750,11 +760,15 @@ class Benchmark(LoggingBase):
         whether the cache exists and if it's still valid (hash matches).
         """
         if self.system_variant.is_container:
-            self._code_package = self._cache_client.get_container(self._deployment_name, self)
+            self._code_package = self._cache_client.get_container(
+                self._deployment_name, self
+            )
             if self._code_package is not None:
                 self._container_uri = self._code_package["image-uri"]
         else:
-            self._code_package = self._cache_client.get_code_package(self._deployment_name, self)
+            self._code_package = self._cache_client.get_code_package(
+                self._deployment_name, self
+            )
 
         self._functions = self._cache_client.get_functions(
             deployment=self._deployment_name,
@@ -799,7 +813,9 @@ class Benchmark(LoggingBase):
                 shutil.copy2(os.path.join(path, f), output_dir)
 
         # support node.js benchmarks with language specific packages
-        nodejs_package_json = os.path.join(path, f"package.json.{self.language_version}")
+        nodejs_package_json = os.path.join(
+            path, f"package.json.{self.language_version}"
+        )
         if os.path.exists(nodejs_package_json):
             shutil.copy2(nodejs_package_json, os.path.join(output_dir, "package.json"))
 
@@ -809,7 +825,10 @@ class Benchmark(LoggingBase):
                 raise RuntimeError(
                     "Variant directory not found for benchmark {} language {} "
                     "variant {}: {}".format(
-                        self.benchmark, self.language_name, self._language_variant, variant_dir
+                        self.benchmark,
+                        self.language_name,
+                        self._language_variant,
+                        variant_dir,
                     )
                 )
 
@@ -830,7 +849,9 @@ class Benchmark(LoggingBase):
                         )
                     )
                 self.logging.info(
-                    "Applied patch for variant {} ({})".format(self._language_variant, patch_file)
+                    "Applied patch for variant {} ({})".format(
+                        self._language_variant, patch_file
+                    )
                 )
             else:
                 # Overlay-based variant: the variant directory contains a complete
@@ -846,7 +867,9 @@ class Benchmark(LoggingBase):
                     variant_dir, f"package.json.{self.language_version}"
                 )
                 if os.path.exists(nodejs_variant_pkg):
-                    shutil.copy2(nodejs_variant_pkg, os.path.join(output_dir, "package.json"))
+                    shutil.copy2(
+                        nodejs_variant_pkg, os.path.join(output_dir, "package.json")
+                    )
                 self.logging.info(
                     "Applied file overlay for variant {}".format(self._language_variant)
                 )
@@ -873,7 +896,9 @@ class Benchmark(LoggingBase):
                     output_dir=output_dir,
                     architecture=self._experiment_config._architecture,
                 )
-                self.logging.debug("Adding benchmark data with command: {}".format(full_cmd))
+                self.logging.debug(
+                    "Adding benchmark data with command: {}".format(full_cmd)
+                )
                 result = subprocess.run(
                     full_cmd,
                     shell=True,
@@ -940,7 +965,7 @@ class Benchmark(LoggingBase):
                 self._deployment_name, self.language_name
             )
             for package in packages:
-                out.write(package)
+                out.write(package if package.endswith("\n") else f"{package}\n")
 
             module_packages = self._system_config.deployment_module_packages(
                 self._deployment_name, self.language_name
@@ -948,7 +973,7 @@ class Benchmark(LoggingBase):
             for bench_module in self._benchmark_config.modules:
                 if bench_module.value in module_packages:
                     for package in module_packages[bench_module.value]:
-                        out.write(package)
+                        out.write(package if package.endswith("\n") else f"{package}\n")
 
     def add_deployment_package_nodejs(self, output_dir: str) -> None:
         """Add Node.js deployment packages to package.json.
@@ -965,7 +990,9 @@ class Benchmark(LoggingBase):
             self._deployment_name, self.language_name
         )
         if len(packages):
-            package_config = os.path.join(output_dir, f"package.json.{self._language_version}")
+            package_config = os.path.join(
+                output_dir, f"package.json.{self._language_version}"
+            )
             if not os.path.exists(package_config):
                 package_config = os.path.join(output_dir, "package.json")
 
@@ -1020,7 +1047,8 @@ class Benchmark(LoggingBase):
                 dependency_name = key.strip('"').strip("'")
                 dependency_version = val.strip('"').strip("'")
                 dependency_blocks += (
-                    self.format_maven_dependency(dependency_name, dependency_version) + "\n"
+                    self.format_maven_dependency(dependency_name, dependency_version)
+                    + "\n"
                 )
 
         if "<!-- PLATFORM_DEPENDENCIES -->" not in pom_content:
@@ -1213,7 +1241,10 @@ class Benchmark(LoggingBase):
             )
         else:
             repo_name = self._system_config.docker_repository()
-            previous_version_image_name, current_version_image_name = self.builder_image_name()
+            (
+                previous_version_image_name,
+                current_version_image_name,
+            ) = self.builder_image_name()
 
             def ensure_image(name: str) -> None:
                 """Internal implementation of checking for Docker image existence.
@@ -1229,7 +1260,9 @@ class Benchmark(LoggingBase):
                 except docker.errors.ImageNotFound:
                     try:
                         self.logging.info(
-                            "Docker pull of image {repo}:{image}".format(repo=repo_name, image=name)
+                            "Docker pull of image {repo}:{image}".format(
+                                repo=repo_name, image=name
+                            )
                         )
                         self._docker_client.images.pull(repo_name, name)
                     except docker.errors.APIError:
@@ -1255,7 +1288,9 @@ class Benchmark(LoggingBase):
                     raise
 
             # Create set of mounted volumes
-            volumes = {os.path.abspath(output_dir): {"bind": "/mnt/function", "mode": "rw"}}
+            volumes = {
+                os.path.abspath(output_dir): {"bind": "/mnt/function", "mode": "rw"}
+            }
             package_script = os.path.abspath(
                 os.path.join(self._benchmark_path, self.language_name, "package.sh")
             )
@@ -1278,7 +1313,9 @@ class Benchmark(LoggingBase):
                 try:
                     self.logging.info(
                         "Docker build of benchmark dependencies in container "
-                        "of image {repo}:{image}".format(repo=repo_name, image=image_name)
+                        "of image {repo}:{image}".format(
+                            repo=repo_name, image=image_name
+                        )
                     )
                     self.logging.info(
                         "Docker mount of benchmark code from path {path}".format(
@@ -1321,7 +1358,9 @@ class Benchmark(LoggingBase):
                             self.logging.error(f"Logs saved to {error_log_path}")
                             raise RuntimeError("Package build failed!")
 
-                        self.logging.debug(f"Build Build logs saved to {error_log_path}")
+                        self.logging.debug(
+                            f"Build Build logs saved to {error_log_path}"
+                        )
                     finally:
                         container.remove()
 
@@ -1350,9 +1389,13 @@ class Benchmark(LoggingBase):
 
     def build(
         self,
-        package_build_step: Callable[[str, Language, str, str, str, bool], Tuple[str, float]],
+        package_build_step: Callable[
+            [str, Language, str, str, str, bool], Tuple[str, float]
+        ],
         container_client: DockerContainer | None,
-        container_build_step: Callable[[str, Language, str, str, str, bool], Tuple[str, float]]
+        container_build_step: Callable[
+            [str, Language, str, str, str, bool], Tuple[str, float]
+        ]
         | None,
     ) -> Tuple[bool, str | None, SystemVariant, str | None]:
         """Build the complete benchmark deployment package.
@@ -1401,7 +1444,9 @@ class Benchmark(LoggingBase):
                 return False, None, self.system_variant, self.container_uri
             else:
                 self.logging.info(
-                    "Using cached benchmark {} at {}".format(self.benchmark, self.code_location)
+                    "Using cached benchmark {} at {}".format(
+                        self.benchmark, self.code_location
+                    )
                 )
                 return False, self.code_location, self.system_variant, None
 
@@ -1410,7 +1455,9 @@ class Benchmark(LoggingBase):
             if not self.is_cached
             else "cached code package is not up to date/build enforced."
         )
-        self.logging.info("Building benchmark {}. Reason: {}".format(self.benchmark, msg))
+        self.logging.info(
+            "Building benchmark {}. Reason: {}".format(self.benchmark, msg)
+        )
         # clear existing cache information
         self._code_package = None
 
@@ -1437,13 +1484,18 @@ class Benchmark(LoggingBase):
             assert container_client is not None
 
             repo_name = self._system_config.docker_repository()
-            previous_version_image_name, current_version_image_name = self.builder_image_name()
+            (
+                previous_version_image_name,
+                current_version_image_name,
+            ) = self.builder_image_name()
 
             # Try current version build image first, fallback to previous version
             image_name = current_version_image_name
             current_available = False
             try:
-                self._docker_client.images.get(f"{repo_name}:{current_version_image_name}")
+                self._docker_client.images.get(
+                    f"{repo_name}:{current_version_image_name}"
+                )
                 current_available = True
             except Exception:
                 # Not available locally, try to pull it
@@ -1451,7 +1503,9 @@ class Benchmark(LoggingBase):
                     self.logging.info(
                         f"Docker pull of build image {repo_name}:{current_version_image_name}"
                     )
-                    self._docker_client.images.pull(repo_name, current_version_image_name)
+                    self._docker_client.images.pull(
+                        repo_name, current_version_image_name
+                    )
                     current_available = True
                 except Exception:
                     pass
@@ -1459,7 +1513,9 @@ class Benchmark(LoggingBase):
             if not current_available:
                 # Current version not available, try previous version
                 try:
-                    self._docker_client.images.get(f"{repo_name}:{previous_version_image_name}")
+                    self._docker_client.images.get(
+                        f"{repo_name}:{previous_version_image_name}"
+                    )
                     image_name = previous_version_image_name
                     self.logging.info(
                         f"Using previous version build image {previous_version_image_name} "
@@ -1471,7 +1527,9 @@ class Benchmark(LoggingBase):
                         self.logging.info(
                             f"Docker pull of build image {repo_name}:{previous_version_image_name}"
                         )
-                        self._docker_client.images.pull(repo_name, previous_version_image_name)
+                        self._docker_client.images.pull(
+                            repo_name, previous_version_image_name
+                        )
                         image_name = previous_version_image_name
                         self.logging.info(
                             f"Using previous version build image {previous_version_image_name} "
@@ -1609,13 +1667,20 @@ class Benchmark(LoggingBase):
         """
         if hasattr(self._benchmark_input_module, "buckets_count"):
             buckets = self._benchmark_input_module.buckets_count()
-            storage = system_resources.get_storage(replace_existing)
-            input, output = storage.benchmark_data(self.benchmark, buckets)
+            storage = None
+            if sum(buckets) > 0:
+                storage = system_resources.get_storage(replace_existing)
+                input, output = storage.benchmark_data(self.benchmark, buckets)
 
-            self._uses_storage = len(input) > 0 or len(output) > 0
+                self._uses_storage = len(input) > 0 or len(output) > 0
 
-            storage_func = storage.uploader_func
-            bucket = storage.get_bucket(Resources.StorageBucketType.BENCHMARKS)
+                storage_func = storage.uploader_func
+                bucket = storage.get_bucket(Resources.StorageBucketType.BENCHMARKS)
+            else:
+                input = []
+                output = []
+                storage_func = None
+                bucket = None
         else:
             input = []
             output = []
@@ -1658,7 +1723,7 @@ class Benchmark(LoggingBase):
         )
 
         # Cache only once we data is in the cloud.
-        if hasattr(self._benchmark_input_module, "buckets_count"):
+        if self._uses_storage and storage is not None:
             self._cache_client.update_storage(
                 storage.deployment_name(),
                 self._benchmark,
@@ -1679,7 +1744,10 @@ class Benchmark(LoggingBase):
         return input_config
 
     def validate_output(
-        self, input_config: dict, output: dict, storage: Optional[PersistentStorage] = None
+        self,
+        input_config: dict,
+        output: dict,
+        storage: Optional[PersistentStorage] = None,
     ) -> str | None:
         """Validate benchmark output against expected values.
 
@@ -1698,9 +1766,17 @@ class Benchmark(LoggingBase):
         """
         if hasattr(self._benchmark_input_module, "validate_output"):
             fn = self._benchmark_input_module.validate_output
-            return fn(self._benchmark_data_path, input_config, output, str(self._language), storage)
+            return fn(
+                self._benchmark_data_path,
+                input_config,
+                output,
+                str(self._language),
+                storage,
+            )
 
-        self.logging.warning(f"Benchmark {self._benchmark} does not implement validate_output.")
+        self.logging.warning(
+            f"Benchmark {self._benchmark} does not implement validate_output."
+        )
         return f"Benchmark {self._benchmark} does not implement validate_output"
 
     def code_package_modify(self, filename: str, data: bytes) -> None:
@@ -1722,7 +1798,9 @@ class Benchmark(LoggingBase):
             assert self.code_location is not None
             self._update_zip(self.code_location, filename, data)
             new_size = self.code_package_recompute_size() / 1024.0 / 1024.0
-            self.logging.info(f"Modified zip package {self.code_location}, new size {new_size} MB")
+            self.logging.info(
+                f"Modified zip package {self.code_location}, new size {new_size} MB"
+            )
         else:
             raise NotImplementedError()
 
@@ -1926,7 +2004,9 @@ def load_benchmark_input(benchmark_path: str) -> BenchmarkModuleInterface:
     import importlib.machinery
     import importlib.util
 
-    loader = importlib.machinery.SourceFileLoader("input", os.path.join(benchmark_path, "input.py"))
+    loader = importlib.machinery.SourceFileLoader(
+        "input", os.path.join(benchmark_path, "input.py")
+    )
     spec = importlib.util.spec_from_loader(loader.name, loader)
     assert spec
     mod = importlib.util.module_from_spec(spec)

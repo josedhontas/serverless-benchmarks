@@ -1,0 +1,26 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+ARG VERSION
+ENV PYTHON_VERSION=${VERSION}
+ENV DEBIAN_FRONTEND="noninteractive"
+
+COPY --from=tianon/gosu:1.19-debian /usr/local/bin/gosu /usr/local/bin/gosu
+
+USER root
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends gcc build-essential zip \
+  && apt-get purge -y --auto-remove
+
+RUN python${PYTHON_VERSION} -mvenv /sebs/env
+ENV PATH /sebs/env/bin:${PATH}
+ENV VIRTUAL_ENV /sebs/env
+
+RUN mkdir -p /sebs/
+COPY dockerfiles/python_installer.sh /sebs/installer.sh
+COPY dockerfiles/entrypoint.sh /sebs/entrypoint.sh
+RUN chmod +x /sebs/entrypoint.sh
+
+ENV SCRIPT_FILE=/mnt/function/package.sh
+CMD /bin/bash /sebs/installer.sh
+ENTRYPOINT ["/sebs/entrypoint.sh"]

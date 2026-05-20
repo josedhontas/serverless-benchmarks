@@ -121,6 +121,29 @@
         "output_buckets": [],
         "type": "minio"
       }
+    },
+    "openfaas": {
+      "gateway": "http://127.0.0.1:8080",
+      "namespace": "openfaas-fn",
+      "faasCli": "faas-cli",
+      "shutdownStorage": false,
+      "experimentalManifest": false,
+      "dockerhubRepository": null,
+      "docker_registry": {
+        "registry": "",
+        "username": "",
+        "password": ""
+      },
+      "storage": {
+        "address": "",
+        "mapped_port": -1,
+        "access_key": "",
+        "secret_key": "",
+        "instance_id": "",
+        "input_buckets": [],
+        "output_buckets": [],
+        "type": "minio"
+      }
     }
   }
 }

@@ -1,7 +1,7 @@
 # Platform Configuration
 
 SeBS supports three commercial serverless platforms: AWS Lambda, Azure Functions, and Google Cloud Functions.
-Furthermore, we support the open source FaaS system OpenWhisk.
+Furthermore, we support the open source FaaS systems OpenWhisk and OpenFaaS.
 
 The file `configs/example.json` contains all parameters that users can change
 to customize the deployment.
@@ -18,6 +18,7 @@ Supported platforms:
 * [Microsoft Azure Functions](#azure-functions)
 * [Google Cloud (GCP) Functions](#google-cloud-functions)
 * [OpenWhisk](#openwhisk)
+* [OpenFaaS](#openfaas)
 
 ## Storage Configuration
 
@@ -457,3 +458,19 @@ To use that feature in SeBS, set the `experimentalManifest` flag to true.
 
 OpenWhisk has a `shutdownStorage` switch that controls the behavior of SeBS.
 When set to true, SeBS will remove the Minio instance after finishing all work.
+
+## OpenFaaS
+
+OpenFaaS support uses `faas-cli` and container deployments. SeBS builds benchmark
+images, pushes them to the configured Docker registry, and deploys them through
+the OpenFaaS gateway as HTTP functions.
+
+The initial OpenFaaS backend supports Python and Node.js benchmarks on `x64`.
+Storage-backed benchmarks use the same self-hosted MinIO and ScyllaDB resources
+as the local and OpenWhisk deployments. The OpenFaaS gateway, namespace, CLI
+binary, Docker registry, and storage settings are configured under
+`.deployment.openfaas`; see `configs/openfaas.json`.
+
+The OpenFaaS cluster must be able to pull the generated function images. For
+local Kubernetes clusters, configure a registry reachable from the cluster and
+set `.deployment.openfaas.docker_registry.registry` accordingly.

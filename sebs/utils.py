@@ -279,7 +279,9 @@ def global_logging() -> None:
     """
     logging_format = "%(asctime)s,%(msecs)d %(levelname)s %(name)s: %(message)s"
     logging_date_format = "%H:%M:%S"
-    logging.basicConfig(format=logging_format, datefmt=logging_date_format, level=logging.INFO)
+    logging.basicConfig(
+        format=logging_format, datefmt=logging_date_format, level=logging.INFO
+    )
 
 
 class SensitiveDataFilter(logging.Filter):
@@ -311,7 +313,9 @@ class SensitiveDataFilter(logging.Filter):
     def __init__(self) -> None:
         """Initialize logging filter."""
         super().__init__()
-        self._url_re: Pattern[str] = re.compile("|".join(SensitiveDataFilter._DEFAULT_URL_PATTERNS))
+        self._url_re: Pattern[str] = re.compile(
+            "|".join(SensitiveDataFilter._DEFAULT_URL_PATTERNS)
+        )
         self._resource_id: Optional[str] = None
         self._resource_re: Optional[Pattern[str]] = None
 
@@ -389,7 +393,8 @@ class SensitiveDataFilter(logging.Filter):
         if record.args:
             if isinstance(record.args, dict):
                 record.args = {
-                    k: self._scrub(v) if isinstance(v, str) else v for k, v in record.args.items()
+                    k: self._scrub(v) if isinstance(v, str) else v
+                    for k, v in record.args.items()
                 }
             else:
                 record.args = tuple(
@@ -601,7 +606,9 @@ class LoggingBase:
             cls.REDACTION_FILTER = SensitiveDataFilter()
 
     @classmethod
-    def set_filtering_resource_id(cls, resource_id: str, cloud_id: Optional[str] = None) -> None:
+    def set_filtering_resource_id(
+        cls, resource_id: str, cloud_id: Optional[str] = None
+    ) -> None:
         """Add resource ID and cloud user IDs to logging filtering.
 
         Args:
@@ -689,7 +696,7 @@ def has_platform(name: str) -> bool:
             import google.cloud.devtools  # noqa: F401
 
             return True
-        elif name in ("local", "openwhisk"):
+        elif name in ("local", "openwhisk", "openfaas"):
             # these don't have specific dependencies
             return True
         else:
@@ -705,7 +712,9 @@ def is_linux() -> bool:
     Returns:
         bool: True if native Linux, False otherwise
     """
-    return platform.system() == "Linux" and "microsoft" not in platform.release().lower()
+    return (
+        platform.system() == "Linux" and "microsoft" not in platform.release().lower()
+    )
 
 
 def catch_interrupt() -> None:
@@ -777,7 +786,9 @@ def ensure_benchmarks_data(logger: ColoredWrapper) -> Path:
         except subprocess.CalledProcessError as e:
             raise RuntimeError(f"Failed to clone benchmarks-data: {e.stderr}") from e
         except FileNotFoundError:
-            raise RuntimeError("git command not found. Please install git to use SeBS") from None
+            raise RuntimeError(
+                "git command not found. Please install git to use SeBS"
+            ) from None
     else:
         # Git clone mode: use submodule
         logger.info("Initializing benchmarks data submodule...")
@@ -792,6 +803,10 @@ def ensure_benchmarks_data(logger: ColoredWrapper) -> Path:
             logger.info("Benchmarks-data submodule initialized successfully")
             return data_dir
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"Failed to initialize benchmarks-data submodule: {e.stderr}") from e
+            raise RuntimeError(
+                f"Failed to initialize benchmarks-data submodule: {e.stderr}"
+            ) from e
         except FileNotFoundError:
-            raise RuntimeError("git command not found. Please install git to use SeBS") from None
+            raise RuntimeError(
+                "git command not found. Please install git to use SeBS"
+            ) from None

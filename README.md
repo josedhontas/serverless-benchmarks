@@ -24,7 +24,8 @@ commercial and black-box platforms
 [Azure Functions](https://azure.microsoft.com/en-us/services/functions/),
 and [Google Cloud Functions](https://cloud.google.com/functions).
 Furthermore, we support the open-source platform [OpenWhisk](https://openwhisk.apache.org/)
-and offer a custom, Docker-based local evaluation platform.
+and [OpenFaaS](https://www.openfaas.com/), and offer a custom, Docker-based local
+evaluation platform.
 
 ## How can SeBS help you?
 

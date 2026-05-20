@@ -99,7 +99,9 @@ class SeBS(LoggingBase):
         """
         return self._config
 
-    def generate_logging_handlers(self, logging_filename: Optional[str] = None) -> LoggingHandlers:
+    def generate_logging_handlers(
+        self, logging_filename: Optional[str] = None
+    ) -> LoggingHandlers:
         """Generate logging handlers for a specific file.
 
         This method creates or retrieves cached logging handlers for a given filename.
@@ -214,13 +216,19 @@ class SeBS(LoggingBase):
             from sebs.openwhisk import OpenWhisk
 
             implementations["openwhisk"] = OpenWhisk
+        if has_platform("openfaas"):
+            from sebs.openfaas import OpenFaaS
+
+            implementations["openfaas"] = OpenFaaS
 
         # Validate deployment platform
         if name not in implementations:
             raise RuntimeError("Deployment {name} not supported!".format(name=name))
 
         # Validate architecture
-        if config["experiments"]["architecture"] not in self._config.supported_architecture(name):
+        if config["experiments"][
+            "architecture"
+        ] not in self._config.supported_architecture(name):
             raise RuntimeError(
                 "{architecture} is not supported in {name}".format(
                     architecture=config["experiments"]["architecture"], name=name
@@ -228,16 +236,22 @@ class SeBS(LoggingBase):
             )
 
         if "system_variant" not in config["experiments"]:
-            config["experiments"]["system_variant"] = self._config.default_system_variant(name)
+            config["experiments"][
+                "system_variant"
+            ] = self._config.default_system_variant(name)
 
         selected_variant = config["experiments"]["system_variant"]
         if selected_variant not in self._config.supported_system_variants(name):
-            raise RuntimeError(f"System variant {selected_variant} is not supported in {name}.")
+            raise RuntimeError(
+                f"System variant {selected_variant} is not supported in {name}."
+            )
 
         # Set up logging and create deployment configuration
         handlers = self.generate_logging_handlers(logging_filename)
         if not deployment_config:
-            deployment_config = Config.deserialize(dep_config, self.cache_client, handlers)
+            deployment_config = Config.deserialize(
+                dep_config, self.cache_client, handlers
+            )
 
         # Create and return the deployment client
         deployment_client = implementations[name](
@@ -326,7 +340,9 @@ class SeBS(LoggingBase):
             raise RuntimeError(f"Experiment {experiment_type} not supported!")
 
         # Create and configure the experiment
-        experiment = implementations[experiment_type](self.get_experiment_config(config))
+        experiment = implementations[experiment_type](
+            self.get_experiment_config(config)
+        )
         experiment.logging_handlers = self.generate_logging_handlers(
             logging_filename=logging_filename
         )
@@ -374,7 +390,9 @@ class SeBS(LoggingBase):
         return benchmark
 
     @staticmethod
-    def get_storage_implementation(storage_type: types.Storage) -> Type[PersistentStorage]:
+    def get_storage_implementation(
+        storage_type: types.Storage,
+    ) -> Type[PersistentStorage]:
         """Get a storage implementation for a specific storage type.
 
         This method returns the class for a persistent storage implementation
@@ -395,7 +413,9 @@ class SeBS(LoggingBase):
         return impl
 
     @staticmethod
-    def get_nosql_implementation(storage_type: types.NoSQLStorage) -> Type[NoSQLStorage]:
+    def get_nosql_implementation(
+        storage_type: types.NoSQLStorage,
+    ) -> Type[NoSQLStorage]:
         """Get a NoSQL storage implementation for a specific storage type.
 
         This method returns the class for a NoSQL storage implementation
