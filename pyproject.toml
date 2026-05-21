@@ -108,6 +108,8 @@ packages = [
     "sebs.gcp",
     "sebs.local",
     "sebs.openwhisk",
+    "sebs.openfaas",
+    "sebs.fission",
     "sebs.faas",
     "sebs.storage",
     "sebs.experiments",

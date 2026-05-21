@@ -19,6 +19,7 @@ Supported platforms:
 * [Google Cloud (GCP) Functions](#google-cloud-functions)
 * [OpenWhisk](#openwhisk)
 * [OpenFaaS](#openfaas)
+* [Fission](#fission)
 
 ## Storage Configuration
 
@@ -474,3 +475,23 @@ binary, Docker registry, and storage settings are configured under
 The OpenFaaS cluster must be able to pull the generated function images. For
 local Kubernetes clusters, configure a registry reachable from the cluster and
 set `.deployment.openfaas.docker_registry.registry` accordingly.
+
+## Fission
+
+Fission support uses container functions on Kubernetes. SeBS builds benchmark
+images, pushes them to the configured Docker registry, applies the Fission
+`Function` CRD through `kubectl`, and creates an HTTP trigger through the
+Fission CLI.
+
+The initial Fission backend supports Python and Node.js benchmarks on `x64`
+with the `container` system variant. It uses the same HTTP wrapper shape as the
+OpenFaaS backend, so benchmark containers listen on port `8080` by default.
+The Fission router URL, function namespace, CLI paths, Docker registry, and
+storage settings are configured under `.deployment.fission`; see
+`configs/fission.json`.
+
+The cluster must be able to pull the generated function images. For local
+Kubernetes clusters, configure a registry reachable from the cluster and set
+`.deployment.fission.docker_registry.registry` accordingly. If the Fission
+router is not exposed at `http://127.0.0.1:8888`, update
+`.deployment.fission.routerUrl` before running experiments.

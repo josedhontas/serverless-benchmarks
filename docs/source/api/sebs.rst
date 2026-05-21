@@ -15,6 +15,7 @@ Subpackages
    sebs.azure
    sebs.experiments
    sebs.faas
+   sebs.fission
    sebs.gcp
    sebs.local
    sebs.openwhisk
