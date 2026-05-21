@@ -121,127 +121,120 @@ python -m sebs.cli --help
 
 The installation of additional platforms is controlled with the `--{platform}` and `--no-{platform}` switches. Currently, the default behavior for `install.py` is to install only the local environment.
 
-## Tutorial
+## Lembrete: comandos para testar OpenFaaS no WSL
 
-We provide a tutorial on basic SeBS functionality in the [SeBS-Tutorial repository](https://github.com/spcl/sebs-tutorial.git).
-You can learn there how to install SeBS, configure it, deploy OpenWhisk on your system, and launch your first experiments.
+### Clonar
 
-## Publications
-
-When using SeBS, please cite our published work.
-You can cite our software repository as well, using the citation button on the right.
-
-SeBS has been originally released with the [Middleware '21 paper](https://dl.acm.org/doi/abs/10.1145/3464298.3476133).
-An extended version of our paper is [available on arXiv](https://arxiv.org/abs/2012.14132), and you can
-find more details about our research work [in this paper summary](https://mcopik.github.io/projects/sebs/).
-
-```
-@inproceedings{copik2021sebs,
-  author = {Copik, Marcin and Kwasniewski, Grzegorz and Besta, Maciej and Podstawski, Michal and Hoefler, Torsten},
-  title = {SeBS: A Serverless Benchmark Suite for Function-as-a-Service Computing},
-  year = {2021},
-  isbn = {9781450385343},
-  publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  url = {https://doi.org/10.1145/3464298.3476133},
-  doi = {10.1145/3464298.3476133},
-  booktitle = {Proceedings of the 22nd International Middleware Conference},
-  pages = {64–78},
-  numpages = {15},
-  keywords = {benchmark, serverless, FaaS, function-as-a-service},
-  location = {Qu\'{e}bec city, Canada},
-  series = {Middleware '21}
-}
+```bash
+git clone https://github.com/josedhontas/serverless-benchmarks.git
+cd serverless-benchmarks
 ```
 
-The SeBS-Flow paper published at [EuroSys'25](https://dl.acm.org/doi/abs/10.1145/3689031.3717465)
-extends SeBS with support for serverless workflows and NoSQL database.
-You can find workflow benchmarks on the [`feature/workflows`](https://github.com/spcl/serverless-benchmarks/tree/feature/workflows) branch   (AWS, Azure, GCP).
+### Benchmarks-data
 
-<details>
-<summary>BibTeX citation for the SeBS-Flow paper.</summary>
-    
-```
-@inproceedings{10.1145/3689031.3717465,
-  author = {Schmid, Larissa and Copik, Marcin and Calotoiu, Alexandru and Brandner, Laurin and Koziolek, Anne and Hoefler, Torsten},
-  title = {SeBS-Flow: Benchmarking Serverless Cloud Function Workflows},
-  year = {2025},
-  isbn = {9798400711961},
-  publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  url = {https://doi.org/10.1145/3689031.3717465},
-  doi = {10.1145/3689031.3717465},
-  booktitle = {Proceedings of the Twentieth European Conference on Computer Systems},
-  pages = {902–920},
-  numpages = {19},
-  keywords = {benchmark, faas, function-as-a-service, orchestration, serverless, serverless DAG, workflow},
-  location = {Rotterdam, Netherlands},
-  series = {EuroSys '25}
-}
-```
-    
-</details>
-
-The SeBS 2.0 workshop paper published at [SESAME @ EuroSys'25](https://dl.acm.org/doi/abs/10.1145/3721465.3721867)
-provides an overview of new and ongoing contributions to SeBS - benchmarks, platforms, languages.
-
-<details>
-<summary>BibTeX citation for the SeBS 2.0 paper.</summary>
-
-```
-@inproceedings{10.1145/3721465.3721867,
-  author = {Copik, Marcin and Calotoiu, Alexandru and Hoefler, Torsten},
-  title = {SeBS 2.0: Keeping up with the Clouds},
-  year = {2025},
-  isbn = {9798400715570},
-  publisher = {Association for Computing Machinery},
-  address = {New York, NY, USA},
-  url = {https://doi.org/10.1145/3721465.3721867},
-  doi = {10.1145/3721465.3721867},
-  booktitle = {Proceedings of the 3rd Workshop on SErverless Systems, Applications and MEthodologies},
-  pages = {42–44},
-  numpages = {3},
-  keywords = {Benchmark, FaaS, Function-as-a-Service, Serverless},
-  location = {Rotterdam, Netherlands},
-  series = {SESAME' 25}
-}
+```bash
+git clone https://github.com/spcl/serverless-benchmarks-data.git benchmarks-data
+rm -rf benchmarks-data/.git
 ```
 
-</details>
+### Config
 
-## Development
+```json
+"gateway": "http://127.0.0.1:8080",
+"faasCli": "faas-cli"
+```
 
-We welcome new contributions! When extending SeBS, please check first [contributor guidelines](docs/contributing.md) to learn the expected code style.
-Please feel free to get in touch with us - we are happy to provide guidance and help you to implement new features in SeBS.
+```json
+"dockerhubRepository": "your-dockerhub-user/serverless-benchmarks"
+```
 
-### Feature Branches
+```bash
+docker login
+```
 
-We provide several experimental features that have not yet been merged into the main branch. You can use them to get early access to upcoming benchmarks, platforms, and experiments.
-However, they can be missing some of the features from the `master` branch.
+### Gateway
 
-* [`feature/workflows`](https://github.com/spcl/serverless-benchmarks/tree/feature/workflows) with serverless workflows benchmarks (AWS, Azure, GCP).
-* [`feature_fission`](https://github.com/spcl/serverless-benchmarks/tree/feature_fission) with support for Fission platform.
-* [`oanarosca/triggers`](https://github.com/spcl/serverless-benchmarks/tree/oanarosca/triggers) with queue and storage triggers (AWS, Azure, GCP).
+```bash
+kubectl port-forward -n openfaas svc/gateway 8080:8080
+```
 
-## Authors & Contributors
+```bash
+curl http://127.0.0.1:8080/system/functions
+```
 
-* [Marcin Copik (ETH Zurich)](https://github.com/mcopik/) - main author.
-* [Michał Podstawski (Future Processing SA)](https://github.com/micpod/) - contributed graph and DNA benchmarks, and worked on Google Cloud support.
-* [Laurin Brandner (ETH Zurich)](https://github.com/lbrndnr) - contributed serverless workflows.
-* [Nico Graf (ETH Zurich)](https://github.com/ncograf/) - contributed to the implementation of regression tests and bugfixes and helped with testing and documentation.
-* [Kacper Janda](https://github.com/Kacpro), [Mateusz Knapik](https://github.com/maknapik), [Jakub Czerski](https://github.com/JmmCz), AGH University of Science and Technology - contributed together Google Cloud support.
-* [Grzegorz Kwaśniewski (ETH Zurich)](https://github.com/gkwasniewski) - worked on the modeling experiments.
-* [Paweł Żuk (University of Warsaw)](https://github.com/pmzuk) - contributed OpenWhisk support.
-* [Sascha Kehrli (ETH Zurich)](https://github.com/skehrli) - contributed local measurement of Docker containers.
-* [Kaleab](https://github.com/Kaleab-git) - contributed to SeBS local backend to make it portable between platforms and more robust on non-Linux systems.
-* [lawrence910426](https://github.com/lawrence910426) - contributed color-coded output to SeBS CLI.
-* [Abhishek Kumar](https://github.com/octonawish-akcodes) - contributed new language versions and Knative support.
-* [Prajin Khadka](https://github.com/prajinkhadka) - contributed new language versions, container support, and ARM builds.
-* [Horia Mercan](https://github.com/HoriaMercan) - contributed new benchmarks in C++.
-* [Dillon Elste (ETH Zurich)](https://github.com/DJAntivenom) - bugfixing in C++.
-* [Mahla Sharifi](https://github.com/mahlashrifi) - contributed support for Java benchmarks.
-* [Alexander Schlieper (ETH Zurich)](https://github.com/xSurus) - improved support for Java benchmarks.
-* [Laurin Jahns (ETH Zurich)](https://github.com/userlaurin) - support for language variants.
-* [Sharayu Rasal](https://github.com/Sharayu1418) - help with function URLs on AWS.
-* [Livio D'Agostini (ETH Zurich)](https://github.com/ldzgch) - new implementations of benchmarks in Node.js.
-* [toooadi (ETH Zurich)](https://github.com/toooadi) - container support for Google Cloud.
+```bash
+PASSWORD=$(kubectl -n openfaas get secret basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode)
+faas-cli login --gateway http://127.0.0.1:8080 --username admin --password "$PASSWORD"
+```
+
+### Rodar com rebuild
+
+```bash
+python3 -m sebs.cli benchmark invoke 110.dynamic-html test \
+  --config configs/openfaas.json \
+  --deployment openfaas \
+  --update-code \
+  --verbose
+```
+
+### Rodar sem rebuild
+
+```bash
+python3 -m sebs.cli benchmark invoke 110.dynamic-html test \
+  --config configs/openfaas.json \
+  --deployment openfaas \
+  --verbose
+```
+
+### Resultado
+
+```bash
+cat experiments.json
+```
+
+### Teste manual
+
+```bash
+FN=sebs-6dbc6478-110-dynamic-html-python-3-11
+```
+
+```bash
+curl -v http://127.0.0.1:8080/function/$FN/_/health
+```
+
+```bash
+curl -s -v \
+  -H "Content-Type: application/json" \
+  -d '{"username":"teste","random_len":10}' \
+  http://127.0.0.1:8080/function/$FN
+```
+
+### Remover funcao
+
+```bash
+faas-cli remove \
+  --name sebs-6dbc6478-110-dynamic-html-python-3-11 \
+  --gateway http://127.0.0.1:8080 \
+  --namespace openfaas-fn
+```
+
+### Recriar funcao
+
+```bash
+python3 -m sebs.cli benchmark invoke 110.dynamic-html test \
+  --config configs/openfaas.json \
+  --deployment openfaas \
+  --update-code \
+  --verbose
+```
+
+### Debug
+
+```bash
+FN=sebs-6dbc6478-110-dynamic-html-python-3-11
+
+kubectl get pods -n openfaas-fn -o wide
+kubectl get deploy -n openfaas-fn
+kubectl describe pod -n openfaas-fn -l faas_function=$FN
+kubectl logs -n openfaas-fn deploy/$FN --tail=100
+```
