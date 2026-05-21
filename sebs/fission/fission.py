@@ -235,9 +235,51 @@ class Fission(System):
     def _apply_function(
         self, function: FissionFunction, code_package: Benchmark
     ) -> None:
-        manifest = self._function_manifest(function, code_package)
-        payload = json.dumps(manifest).encode("utf-8")
-        self._run_kubectl(["apply", "-f", "-"], input_data=payload)
+        envs = self._envs(code_package)
+        if envs:
+            manifest = self._function_manifest(function, code_package)
+            payload = json.dumps(manifest).encode("utf-8")
+            self._run_kubectl(["apply", "-f", "-"], input_data=payload)
+            return
+
+        get_result = self._run_fission_cli(
+            [
+                "function",
+                "get",
+                "--name",
+                function.name,
+                "--namespace",
+                self.config.namespace,
+            ],
+            check=False,
+        )
+        if get_result.returncode == 0:
+            args = [
+                "function",
+                "update-container",
+                "--name",
+                function.name,
+                "--image",
+                function.config.image,
+                "--port",
+                str(self.config.function_port),
+                "--namespace",
+                self.config.namespace,
+            ]
+        else:
+            args = [
+                "function",
+                "run-container",
+                "--name",
+                function.name,
+                "--image",
+                function.config.image,
+                "--port",
+                str(self.config.function_port),
+                "--namespace",
+                self.config.namespace,
+            ]
+        self._run_fission_cli(args)
 
     def _route_path(self, function_name: str) -> str:
         return f"/{function_name}"
@@ -271,9 +313,34 @@ class Fission(System):
             ]
         )
 
+    def _wait_function_ready(self, function_name: str, timeout: int) -> None:
+        wait_timeout = max(timeout, 180)
+        result = self._run_kubectl(
+            [
+                "wait",
+                "--for=condition=ready",
+                "pod",
+                "-l",
+                f"functionName={function_name}",
+                "--namespace",
+                self.config.namespace,
+                "--timeout",
+                f"{wait_timeout}s",
+            ],
+            check=False,
+        )
+        if result.returncode != 0:
+            stderr = result.stderr.decode("utf-8", errors="replace")
+            stdout = result.stdout.decode("utf-8", errors="replace")
+            self.logging.warning(
+                f"Timed out waiting for Fission function pod {function_name}: "
+                f"{stderr or stdout}"
+            )
+
     def _deploy(self, function: FissionFunction, code_package: Benchmark) -> None:
         self._apply_function(function, code_package)
         self._apply_route(function.name)
+        self._wait_function_ready(function.name, code_package.benchmark_config.timeout)
 
     def create_function(
         self,
