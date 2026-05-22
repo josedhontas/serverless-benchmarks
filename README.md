@@ -238,3 +238,235 @@ kubectl get deploy -n openfaas-fn
 kubectl describe pod -n openfaas-fn -l faas_function=$FN
 kubectl logs -n openfaas-fn deploy/$FN --tail=100
 ```
+
+## Lembrete: comandos para testar Fission no WSL
+
+### Pre-requisitos
+
+O Fission precisa estar instalado no cluster Kubernetes, e o CLI `fission`,
+`kubectl` e `docker` precisam funcionar no WSL:
+
+```bash
+docker ps
+kubectl get nodes
+fission version
+fission check
+```
+
+### Benchmarks-data
+
+Se o clone nao tiver o diretorio `benchmarks-data`, baixe os dados:
+
+```bash
+git clone https://github.com/spcl/serverless-benchmarks-data.git benchmarks-data
+rm -rf benchmarks-data/.git
+```
+
+### Config
+
+No arquivo `configs/fission.json`, ajuste o repositorio Docker para uma imagem
+que o cluster consiga puxar:
+
+```json
+"dockerhubRepository": "your-dockerhub-user/serverless-benchmarks"
+```
+
+Depois faca login no Docker Hub:
+
+```bash
+docker login
+```
+
+Para o teste simples com `110.dynamic-html`, nao configure storage no
+`configs/fission.json`. Esse benchmark nao precisa de MinIO/ScyllaDB.
+
+### Router
+
+Exponha o router do Fission em outro terminal e deixe esse comando rodando:
+
+```bash
+kubectl port-forward -n fission svc/router 8888:80
+```
+
+Teste se o router responde:
+
+```bash
+curl -i http://127.0.0.1:8888/
+```
+
+### Rodar com rebuild
+
+```bash
+python3 -m sebs.cli benchmark invoke 110.dynamic-html test \
+  --config configs/fission.json \
+  --deployment fission \
+  --architecture x64 \
+  --system-variant container \
+  --repetitions 1 \
+  --update-code \
+  --timeout 120 \
+  --verbose \
+  --output-dir out-fission-fixed
+```
+
+### Rodar sem rebuild
+
+```bash
+python3 -m sebs.cli benchmark invoke 110.dynamic-html test \
+  --config configs/fission.json \
+  --deployment fission \
+  --architecture x64 \
+  --system-variant container \
+  --repetitions 1 \
+  --timeout 120 \
+  --verbose \
+  --output-dir out-fission-fixed-2
+```
+
+### Resultado
+
+O SeBS salva o resultado em `experiments.json` dentro do diretorio passado em
+`--output-dir`:
+
+```bash
+python3 -m json.tool out-fission-fixed/experiments.json | less
+```
+
+Com `jq`:
+
+```bash
+jq '.invocations' out-fission-fixed/experiments.json
+jq -r '.invocations[0].output.result.result' out-fission-fixed/experiments.json | head -40
+```
+
+### Teste com storage object no Fission
+
+Para benchmarks que usam object storage, suba o MinIO pelo SeBS e salve a
+configuracao gerada:
+
+```bash
+python3 -m sebs.cli storage start object configs/storage.json \
+  --output-json storage-object.json
+```
+
+No WSL, descubra o IP que o processo local do SeBS consegue usar:
+
+```bash
+hostname -I | awk '{print $1}'
+```
+
+Atualize o endereco do MinIO no arquivo gerado. Troque `172.31.213.9` pelo IP
+retornado no comando anterior:
+
+```bash
+jq '.object.minio.address = "172.31.213.9:9011"' storage-object.json > /tmp/storage-object.json
+mv /tmp/storage-object.json storage-object.json
+```
+
+Antes de rodar o benchmark, confirme se um pod do Kubernetes consegue chegar no
+MinIO:
+
+```bash
+kubectl run curltest --rm -i --restart=Never \
+  --image=curlimages/curl -- \
+  -sS -o /dev/null -w "%{http_code}\n" \
+  http://host.docker.internal:9011/minio/health/live
+```
+
+O esperado e `200`. Para validar Fission + MinIO, use `311.compression`, porque
+ele usa dados locais do `benchmarks-data` e nao depende de URL externa:
+
+```bash
+python3 -m sebs.cli benchmark invoke 311.compression test \
+  --config configs/fission.json \
+  --deployment fission \
+  --architecture x64 \
+  --system-variant container \
+  --storage-configuration storage-object.json \
+  --repetitions 1 \
+  --update-code \
+  --update-storage \
+  --timeout 180 \
+  --verbose \
+  --validate \
+  --output-dir out-fission-compression
+```
+
+O teste passou quando aparecer:
+
+```text
+Invoke of function was successful
+output validation passed
+Save results to .../out-fission-compression/experiments.json
+```
+
+Para ver o resultado bruto com `cat`:
+
+```bash
+cat out-fission-compression/experiments.json
+```
+
+Se quiser ver so o comeco do arquivo:
+
+```bash
+cat out-fission-compression/experiments.json | head -n 80
+```
+
+O benchmark `120.uploader` tambem usa storage, mas depende de uma URL externa da
+Wikimedia. Se ele falhar com `HTTP Error 400: Use thumbnail sizes...`, isso e
+problema da URL usada pelo benchmark, nao necessariamente do Fission ou do
+MinIO.
+
+### Teste manual da funcao HTML
+
+Se quiser testar a imagem gerada sem passar pelo SeBS, crie uma funcao curta:
+
+```bash
+fission route delete --name sebsraw || true
+fission fn delete --name sebsraw || true
+
+fission fn run-container \
+  --name sebsraw \
+  --image your-dockerhub-user/serverless-benchmarks:function.fission.110.dynamic-html.python-3.11-x64-1.2.1 \
+  --port 8080
+
+fission route create \
+  --name sebsraw \
+  --function sebsraw \
+  --url /sebsraw \
+  --method POST
+
+kubectl wait --for=condition=ready pod \
+  -l functionName=sebsraw \
+  -n default \
+  --timeout=180s
+```
+
+Invoque a funcao:
+
+```bash
+curl -i -X POST http://127.0.0.1:8888/sebsraw \
+  -H 'Content-Type: application/json' \
+  -d '{"username":"testname","random_len":10}'
+```
+
+### Debug
+
+```bash
+FN=sebsraw
+
+fission fn list
+fission route list
+fission fn pods --name $FN
+
+kubectl get pods -A --show-labels | grep $FN || true
+kubectl get deploy -A | grep $FN || true
+kubectl get svc -A | grep $FN || true
+
+kubectl -n fission logs deploy/executor --tail=120
+kubectl -n fission logs deploy/router --tail=80
+```
+
+Se o pod ficar em `ImagePullBackOff`, o cluster nao conseguiu baixar a imagem.
+Verifique se o repositorio Docker existe, se esta publico ou se o cluster tem
+`imagePullSecret` configurado.

@@ -220,6 +220,10 @@ class SeBS(LoggingBase):
             from sebs.openfaas import OpenFaaS
 
             implementations["openfaas"] = OpenFaaS
+        if has_platform("fission"):
+            from sebs.fission import Fission
+
+            implementations["fission"] = Fission
 
         # Validate deployment platform
         if name not in implementations:

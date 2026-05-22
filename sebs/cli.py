@@ -127,7 +127,9 @@ def common_params(func):
     @click.option(
         "--deployment",
         default=None,
-        type=click.Choice(["azure", "aws", "gcp", "local", "openwhisk", "openfaas"]),
+        type=click.Choice(
+            ["azure", "aws", "gcp", "local", "openwhisk", "openfaas", "fission"]
+        ),
         help="Cloud deployment to use.",
     )
     @click.option(
@@ -1047,7 +1049,9 @@ def docker_cmd():
 @click.option(
     "--deployment",
     default=None,
-    type=click.Choice(["local", "aws", "azure", "gcp", "openwhisk", "openfaas"]),
+    type=click.Choice(
+        ["local", "aws", "azure", "gcp", "openwhisk", "openfaas", "fission"]
+    ),
     help="Deployment platform to build images for",
 )
 @click.option(
@@ -1129,7 +1133,9 @@ def docker_build(
 @click.option(
     "--deployment",
     default=None,
-    type=click.Choice(["local", "aws", "azure", "gcp", "openwhisk", "openfaas"]),
+    type=click.Choice(
+        ["local", "aws", "azure", "gcp", "openwhisk", "openfaas", "fission"]
+    ),
     help="Deployment platform to push images for",
 )
 @click.option(

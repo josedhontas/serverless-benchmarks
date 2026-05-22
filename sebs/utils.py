@@ -191,7 +191,7 @@ def append_nested_dict(cfg: dict, keys: List[str], value: Optional[dict]) -> Non
         # make sure parent keys exist
         for key in keys[:-1]:
             cfg = cfg.setdefault(key, {})
-        cfg[keys[-1]] = {**cfg[keys[-1]], **value}
+        cfg[keys[-1]] = {**cfg.get(keys[-1], {}), **value}
 
 
 def find(name: str, path: str) -> Optional[str]:
@@ -696,7 +696,7 @@ def has_platform(name: str) -> bool:
             import google.cloud.devtools  # noqa: F401
 
             return True
-        elif name in ("local", "openwhisk", "openfaas"):
+        elif name in ("local", "openwhisk", "openfaas", "fission"):
             # these don't have specific dependencies
             return True
         else:
