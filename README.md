@@ -339,6 +339,84 @@ jq '.invocations' out-fission-fixed/experiments.json
 jq -r '.invocations[0].output.result.result' out-fission-fixed/experiments.json | head -40
 ```
 
+### Teste com storage object no Fission
+
+Para benchmarks que usam object storage, suba o MinIO pelo SeBS e salve a
+configuracao gerada:
+
+```bash
+python3 -m sebs.cli storage start object configs/storage.json \
+  --output-json storage-object.json
+```
+
+No WSL, descubra o IP que o processo local do SeBS consegue usar:
+
+```bash
+hostname -I | awk '{print $1}'
+```
+
+Atualize o endereco do MinIO no arquivo gerado. Troque `172.31.213.9` pelo IP
+retornado no comando anterior:
+
+```bash
+jq '.object.minio.address = "172.31.213.9:9011"' storage-object.json > /tmp/storage-object.json
+mv /tmp/storage-object.json storage-object.json
+```
+
+Antes de rodar o benchmark, confirme se um pod do Kubernetes consegue chegar no
+MinIO:
+
+```bash
+kubectl run curltest --rm -i --restart=Never \
+  --image=curlimages/curl -- \
+  -sS -o /dev/null -w "%{http_code}\n" \
+  http://host.docker.internal:9011/minio/health/live
+```
+
+O esperado e `200`. Para validar Fission + MinIO, use `311.compression`, porque
+ele usa dados locais do `benchmarks-data` e nao depende de URL externa:
+
+```bash
+python3 -m sebs.cli benchmark invoke 311.compression test \
+  --config configs/fission.json \
+  --deployment fission \
+  --architecture x64 \
+  --system-variant container \
+  --storage-configuration storage-object.json \
+  --repetitions 1 \
+  --update-code \
+  --update-storage \
+  --timeout 180 \
+  --verbose \
+  --validate \
+  --output-dir out-fission-compression
+```
+
+O teste passou quando aparecer:
+
+```text
+Invoke of function was successful
+output validation passed
+Save results to .../out-fission-compression/experiments.json
+```
+
+Para ver o resultado bruto com `cat`:
+
+```bash
+cat out-fission-compression/experiments.json
+```
+
+Se quiser ver so o comeco do arquivo:
+
+```bash
+cat out-fission-compression/experiments.json | head -n 80
+```
+
+O benchmark `120.uploader` tambem usa storage, mas depende de uma URL externa da
+Wikimedia. Se ele falhar com `HTTP Error 400: Use thumbnail sizes...`, isso e
+problema da URL usada pelo benchmark, nao necessariamente do Fission ou do
+MinIO.
+
 ### Teste manual da funcao HTML
 
 Se quiser testar a imagem gerada sem passar pelo SeBS, crie uma funcao curta:
