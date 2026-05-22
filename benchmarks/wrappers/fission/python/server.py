@@ -9,15 +9,15 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 CODE_LOCATION = "/function"
 CODE_PARENT = os.path.dirname(CODE_LOCATION)
-sys.path.append(CODE_LOCATION)
-sys.path.append(CODE_PARENT)
+sys.path.insert(0, CODE_PARENT)
 sys.path.append(os.path.join(CODE_LOCATION, ".python_packages/lib/site-packages/"))
 
 
 def _handler():
     try:
         return importlib.import_module("function.function").handler
-    except ModuleNotFoundError:
+    except (ImportError, ModuleNotFoundError):
+        sys.path.insert(0, CODE_LOCATION)
         return importlib.import_module("function").handler
 
 
