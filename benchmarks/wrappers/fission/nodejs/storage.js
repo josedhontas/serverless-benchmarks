@@ -2,6 +2,8 @@
 const Minio = require("minio");
 const fs = require("fs");
 const path = require("path");
+const stream = require("stream");
+const { v4: uuidv4 } = require("uuid");
 
 function configValue(key) {
   if (key in process.env) {
@@ -53,12 +55,46 @@ class storage {
     });
   }
 
+  uniqueName(file) {
+    const parsed = path.parse(file);
+    const uuidName = uuidv4().split("-")[0];
+    return path.join(parsed.dir, `${parsed.name}.${uuidName}${parsed.ext}`);
+  }
+
   async download(bucket, key, filepath) {
+    fs.mkdirSync(path.dirname(filepath), { recursive: true });
     await this.client.fGetObject(bucket, key, filepath);
   }
 
-  async upload(bucket, key, filepath) {
-    await this.client.fPutObject(bucket, key, filepath);
+  upload(bucket, key, filepath) {
+    const uniqueName = this.uniqueName(key);
+    return [uniqueName, this.client.fPutObject(bucket, uniqueName, filepath)];
+  }
+
+  async downloadDirectory(bucket, prefix, downloadPath) {
+    const objectStream = this.client.listObjects(bucket, prefix, true);
+    const downloads = [];
+    return await new Promise((resolve, reject) => {
+      objectStream.on("data", (obj) => {
+        const fileName = obj.name;
+        const outputPath = path.join(downloadPath, fileName);
+        fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+        downloads.push(this.client.fGetObject(bucket, fileName, outputPath));
+      });
+      objectStream.on("error", reject);
+      objectStream.on("end", () => Promise.all(downloads).then(resolve).catch(reject));
+    });
+  }
+
+  uploadStream(bucket, key) {
+    const writeStream = new stream.PassThrough();
+    const uniqueName = this.uniqueName(key);
+    const promise = this.client.putObject(bucket, uniqueName, writeStream, writeStream.size);
+    return [writeStream, promise, uniqueName];
+  }
+
+  downloadStream(bucket, key) {
+    return this.client.getObject(bucket, key);
   }
 
   async list_keys(bucket) {
