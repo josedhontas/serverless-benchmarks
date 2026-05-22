@@ -1,5 +1,6 @@
 # Copyright 2020-2025 ETH Zurich and the SeBS authors. All rights reserved.
 import datetime
+import importlib
 import json
 import os
 import sys
@@ -7,8 +8,17 @@ import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 CODE_LOCATION = "/function"
+CODE_PARENT = os.path.dirname(CODE_LOCATION)
 sys.path.append(CODE_LOCATION)
+sys.path.append(CODE_PARENT)
 sys.path.append(os.path.join(CODE_LOCATION, ".python_packages/lib/site-packages/"))
+
+
+def _handler():
+    try:
+        return importlib.import_module("function.function").handler
+    except ModuleNotFoundError:
+        return importlib.import_module("function").handler
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -53,9 +63,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             payload = json.loads(self._read_body() or b"{}")
 
-            from function import handler
-
-            ret = handler(payload)
+            ret = _handler()(payload)
             end = datetime.datetime.now()
             is_cold = False
             cold_file = "/tmp/sebs-cold-run"
