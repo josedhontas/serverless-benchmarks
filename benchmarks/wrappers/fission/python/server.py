@@ -14,11 +14,7 @@ sys.path.append(os.path.join(CODE_LOCATION, ".python_packages/lib/site-packages/
 
 
 def _handler():
-    try:
-        return importlib.import_module("function.function").handler
-    except (ImportError, ModuleNotFoundError):
-        sys.path.insert(0, CODE_LOCATION)
-        return importlib.import_module("function").handler
+    return importlib.import_module("function.function").handler
 
 
 class Handler(BaseHTTPRequestHandler):
