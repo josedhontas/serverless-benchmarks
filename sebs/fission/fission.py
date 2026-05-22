@@ -232,15 +232,35 @@ class Fission(System):
             },
         }
 
+    def _env_configmap_name(self, function_name: str) -> str:
+        return self.format_function_name(f"{function_name}-env")
+
+    def _apply_env_configmap(self, function_name: str, envs: Dict[str, str]) -> str:
+        configmap_name = self._env_configmap_name(function_name)
+        args = [
+            "create",
+            "configmap",
+            configmap_name,
+            "--namespace",
+            self.config.namespace,
+            "--dry-run=client",
+            "-o",
+            "json",
+        ]
+        for key, value in sorted(envs.items()):
+            args.extend(["--from-literal", f"{key}={value}"])
+
+        created = self._run_kubectl(args)
+        self._run_kubectl(["apply", "-f", "-"], input_data=created.stdout)
+        return configmap_name
+
     def _apply_function(
         self, function: FissionFunction, code_package: Benchmark
     ) -> None:
         envs = self._envs(code_package)
-        if envs:
-            manifest = self._function_manifest(function, code_package)
-            payload = json.dumps(manifest).encode("utf-8")
-            self._run_kubectl(["apply", "-f", "-"], input_data=payload)
-            return
+        configmap_name = (
+            self._apply_env_configmap(function.name, envs) if envs else None
+        )
 
         get_result = self._run_fission_cli(
             [
@@ -279,6 +299,8 @@ class Fission(System):
                 "--namespace",
                 self.config.namespace,
             ]
+        if configmap_name is not None:
+            args.extend(["--configmap", configmap_name])
         self._run_fission_cli(args)
 
     def _route_path(self, function_name: str) -> str:
@@ -498,6 +520,17 @@ class Fission(System):
                 func_name,
                 "--namespace",
                 self.config.namespace,
+            ],
+            check=False,
+        )
+        self._run_kubectl(
+            [
+                "delete",
+                "configmap",
+                self._env_configmap_name(func_name),
+                "--namespace",
+                self.config.namespace,
+                "--ignore-not-found",
             ],
             check=False,
         )

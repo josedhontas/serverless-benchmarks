@@ -1,12 +1,39 @@
 // Copyright 2020-2025 ETH Zurich and the SeBS authors. All rights reserved.
 const Minio = require("minio");
+const fs = require("fs");
+const path = require("path");
+
+function configValue(key) {
+  if (key in process.env) {
+    return process.env[key];
+  }
+
+  const configsDir = "/configs";
+  if (!fs.existsSync(configsDir)) {
+    return undefined;
+  }
+
+  const stack = [configsDir];
+  while (stack.length > 0) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const entryPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(entryPath);
+      } else if (entry.name === key) {
+        return fs.readFileSync(entryPath, "utf8").trim();
+      }
+    }
+  }
+  return undefined;
+}
 
 class storage {
   static get_instance() {
     if (storage.instance === undefined) {
-      let address = process.env.MINIO_ADDRESS;
-      let access_key = process.env.MINIO_ACCESS_KEY;
-      let secret_key = process.env.MINIO_SECRET_KEY;
+      let address = configValue("MINIO_ADDRESS");
+      let access_key = configValue("MINIO_ACCESS_KEY");
+      let secret_key = configValue("MINIO_SECRET_KEY");
       if (address === undefined || access_key === undefined || secret_key === undefined) {
         throw new Error("Could not create storage, no configuration found!");
       }
