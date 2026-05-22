@@ -191,7 +191,7 @@ def append_nested_dict(cfg: dict, keys: List[str], value: Optional[dict]) -> Non
         # make sure parent keys exist
         for key in keys[:-1]:
             cfg = cfg.setdefault(key, {})
-        cfg[keys[-1]] = {**cfg[keys[-1]], **value}
+        cfg[keys[-1]] = {**cfg.get(keys[-1], {}), **value}
 
 
 def find(name: str, path: str) -> Optional[str]:
