@@ -54,7 +54,7 @@
     "name": "knative",
     "knative": {
       "gateway": "http://127.0.0.1:8080",
-      "urlTemplate": "{gateway}/{name}",
+      "urlTemplate": "http://{name}.{namespace}.127.0.0.1.sslip.io",
       "hostTemplate": "",
       "namespace": "default",
       "kubectlCli": "kubectl",
