@@ -42,6 +42,8 @@ class Platforms(str, Enum):
     LOCAL = "local"
     OPENWHISK = "openwhisk"
     OPENFAAS = "openfaas"
+    FISSION = "fission"
+    KNATIVE = "knative"
 
 
 class Storage(str, Enum):

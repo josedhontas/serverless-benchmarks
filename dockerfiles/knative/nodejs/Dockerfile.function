@@ -1,0 +1,9 @@
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+WORKDIR /function
+COPY . /function/
+RUN npm install --no-package-lock --production && npm cache clean --force
+
+EXPOSE 8080
+CMD ["node", "/function/server.js"]
