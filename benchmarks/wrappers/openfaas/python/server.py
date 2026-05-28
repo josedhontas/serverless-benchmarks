@@ -53,7 +53,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             payload = json.loads(self._read_body() or b"{}")
 
-            from function import handler
+            from function.function import handler
 
             ret = handler(payload)
             end = datetime.datetime.now()
