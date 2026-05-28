@@ -7,7 +7,6 @@ import uuid
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 CODE_LOCATION = "/function"
-sys.path.append(CODE_LOCATION)
 sys.path.append(os.path.join(CODE_LOCATION, ".python_packages/lib/site-packages/"))
 
 
@@ -52,6 +51,15 @@ class Handler(BaseHTTPRequestHandler):
         request_id = str(uuid.uuid4())
         try:
             payload = json.loads(self._read_body() or b"{}")
+
+            site_packages = [
+                path
+                for path in sys.path
+                if "site-packages" in path and path != CODE_LOCATION
+            ]
+            sys.path = site_packages + [
+                path for path in sys.path if path not in (CODE_LOCATION, "")
+            ]
 
             from function.function import handler
 
