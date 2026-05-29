@@ -240,7 +240,16 @@ class Cache(LoggingBase):
         the cache directory and loads them into memory.
         """
         with self._lock:
-            for cloud in ["azure", "aws", "gcp", "openwhisk", "openfaas", "local"]:
+            for cloud in [
+                "azure",
+                "aws",
+                "gcp",
+                "openwhisk",
+                "openfaas",
+                "fission",
+                "knative",
+                "local",
+            ]:
                 cloud_config_file = os.path.join(
                     self.cache_dir, "{}.json".format(cloud)
                 )
@@ -290,7 +299,16 @@ class Cache(LoggingBase):
         """
         if self.config_updated:
             with self._lock:
-                for cloud in ["azure", "aws", "gcp", "openwhisk", "openfaas", "local"]:
+                for cloud in [
+                    "azure",
+                    "aws",
+                    "gcp",
+                    "openwhisk",
+                    "openfaas",
+                    "fission",
+                    "knative",
+                    "local",
+                ]:
                     if cloud in self.cached_config:
                         cloud_config_file = os.path.join(
                             self.cache_dir, "{}.json".format(cloud)

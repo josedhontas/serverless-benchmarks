@@ -447,6 +447,10 @@ class Config(ABC, LoggingBase):
             from sebs.fission.config import FissionConfig
 
             implementations["fission"] = FissionConfig.deserialize
+        if has_platform("knative"):
+            from sebs.knative.config import KnativeConfig
+
+            implementations["knative"] = KnativeConfig.deserialize
         func = implementations.get(name)
         assert func, "Unknown config type!"
         return func(config[name] if name in config else config, cache, handlers)

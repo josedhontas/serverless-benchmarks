@@ -110,6 +110,7 @@ packages = [
     "sebs.openwhisk",
     "sebs.openfaas",
     "sebs.fission",
+    "sebs.knative",
     "sebs.faas",
     "sebs.storage",
     "sebs.experiments",

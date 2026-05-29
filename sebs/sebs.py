@@ -224,6 +224,10 @@ class SeBS(LoggingBase):
             from sebs.fission import Fission
 
             implementations["fission"] = Fission
+        if has_platform("knative"):
+            from sebs.knative import Knative
+
+            implementations["knative"] = Knative
 
         # Validate deployment platform
         if name not in implementations:
